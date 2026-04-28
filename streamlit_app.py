@@ -79,6 +79,8 @@ try:
         if shp_file:
             gdf = gpd.read_file(shp_file)
             if gdf.crs != "EPSG:4326":
+                indian_1975_with_shift = "+proj=utm +zone=47 +ellps=evrst30 +towgs84=204,837,295,0,0,0,0 +units=m +no_defs"
+                gdf.crs = indian_1975_with_shift
                 gdf = gdf.to_crs(epsg=4326)
             
             st.write(f"✅ พบข้อมูล {len(gdf)} features")
