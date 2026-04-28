@@ -92,7 +92,7 @@ try:
             
             if selected_indices:
                 filtered_gdf = gdf.loc[selected_indices]
-                st.dataframe(filtered_gdf)
+                st.dataframe(gdf)
                 # แผนที่ภาพถ่ายดาวเทียม
                 m = leafmap.Map(google_map="SATELLITE")
                 m.add_gdf(filtered_gdf, layer_name="Preview")
