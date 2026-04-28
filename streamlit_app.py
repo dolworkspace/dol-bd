@@ -93,7 +93,20 @@ try:
                 #filtered_gdf = filtered_gdf.reset_index(drop=True)
                 #st.dataframe(filtered_gdf)
                 # แผนที่ภาพถ่ายดาวเทียม
-                m = leafmap.Map(google_map="SATELLITE", max_zoom=22, max_native_zoom=18)
+                #m = leafmap.Map(google_map="SATELLITE", max_zoom=22, max_native_zoom=18)
+                m = leafmap.Map(max_zoom=22) 
+
+                # 2. เพิ่ม Google Satellite Layer แบบกำหนดค่า Zoom เอง
+                # ใช้ URL มาตรฐานของ Google และกำหนด max_native_zoom
+                google_satellite_url = "https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}"
+                
+                m.add_tile_layer(
+                    url=google_satellite_url,
+                    name="Google Satellite",
+                    attribution="Google",
+                    max_zoom=22,           # ระดับที่อนุญาตให้ซูมในหน้าจอ (18-22 จะเป็นการขยายภาพ)
+                    max_native_zoom=18     # ระดับซูมสูงสุดที่ Google มีภาพจริง (ปกติคือ 18 หรือ 19)
+                )
                 m.add_gdf(filtered_gdf, layer_name="Preview")
                 m.zoom_to_gdf(filtered_gdf)
                 st_folium(m, width=1300, height=450)
