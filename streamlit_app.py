@@ -93,7 +93,7 @@ try:
                 #filtered_gdf = filtered_gdf.reset_index(drop=True)
                 #st.dataframe(filtered_gdf)
                 # แผนที่ภาพถ่ายดาวเทียม
-                m = leafmap.Map(google_map="SATELLITE", max_zoom=22)
+                m = leafmap.Map(google_map="SATELLITE", max_zoom=22, max_native_zoom=18)
                 m.add_gdf(filtered_gdf, layer_name="Preview")
                 m.zoom_to_gdf(filtered_gdf)
                 st_folium(m, width=1300, height=450)
