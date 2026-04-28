@@ -49,23 +49,21 @@ def delete_drive_files(file_ids_str, creds):
 
 # --- 3. UI LAYOUT ---
 
-st.set_page_config(page_title="Geo-Data Collector Pro", layout="wide")
-st.title("📍 ระบบบันทึกข้อมูลเชิงพื้นที่สมบูรณ์แบบ")
+st.set_page_config(page_title="Geo-Data Collector", layout="wide")
+st.title("📍 ระบบบันทึกข้อมูลเชิงพื้นที่")
 
 try:
     df_office = load_office_data()
 
     # SECTION 1: ข้อมูลเบื้องต้น
-    with st.expander("📝 ส่วนที่ 1: ข้อมูลทั่วไป", expanded=True):
-        c1, c2, c3 = st.columns(3)
+    with st.expander("📝 ส่วนที่ 1: ข้อมูลสำนักงานที่ดิน", expanded=True):
+        c1, c2 = st.columns([0.3,0.6])
         with c1:
             provinces = sorted(df_office['pro_name'].unique())
             sel_province = st.selectbox("เลือกจังหวัด", provinces)
         with c2:
             filtered_offices = df_office[df_office['pro_name'] == sel_province]
-            sel_office = st.selectbox("เลือกหน่วยงาน", sorted(filtered_offices['office_name'].unique()))
-        with c3:
-            user_note = st.text_input("บันทึกเพิ่มเติม")
+            sel_office = st.selectbox("เลือกสำนักงานที่ดิน", sorted(filtered_offices['office_name'].unique()))
 
     # SECTION 2: อัพโหลดและ Preview
     with st.expander("🗺️ ส่วนที่ 2: อัพโหลดและตรวจสอบแผนที่", expanded=True):
@@ -105,7 +103,7 @@ try:
 
     # SECTION 3: บันทึกข้อมูล
     if st.button("🚀 ยืนยันและบันทึกข้อมูลทั้งหมด", use_container_width=True):
-        if not (shp_file and img_files and user_note and selected_indices):
+        if not (shp_file and img_files  and selected_indices):
             st.error("❌ ข้อมูลไม่ครบ: กรุณาใส่โน้ต เลือกรูปภาพ และเลือก Feature ในแผนที่")
         else:
             batch_id = str(uuid.uuid4())
@@ -136,7 +134,7 @@ try:
                 sheet = gc.open_by_key(SPREADSHEET_ID).sheet1
                 sheet.append_row([
                     str(datetime.datetime.now()), sel_province, sel_office, 
-                    user_note, uploaded_drive_ids, feature_ids_str, batch_id
+                    uploaded_drive_ids, feature_ids_str, batch_id
                 ])
                 
                 bar.progress(100)
