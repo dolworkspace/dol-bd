@@ -1,6 +1,153 @@
 import streamlit as st
+import pandas as pd
+import geopandas as gpd
+from sqlalchemy import create_engine, text
+from googleapiclient.discovery import build
+from googleapiclient.http import MediaIoBaseUpload
+from google.oauth2 import service_account
+import gspread
+import datetime
+import uuid
+import leafmap.foliumap as leafmap
+from streamlit_folium import st_folium
 
-st.title("🎈 My new app")
-st.write(
-    "Let's start building! For help and inspiration, head over to [docs.streamlit.io](https://docs.streamlit.io/)."
-)
+# --- 1. CONFIGURATION ---
+CSV_URL = "https://raw.githubusercontent.com/chakrit39/event2023/refs/heads/main/office_seq.csv"
+DB_CONFIG = "postgresql://username:password@host:port/database"
+GOOGLE_SERVICE_ACCOUNT_FILE = 'service_account.json'
+SPREADSHEET_ID = 'YOUR_GOOGLE_SHEET_ID'
+DRIVE_FOLDER_ID = 'YOUR_GOOGLE_DRIVE_FOLDER_ID'
+
+# --- 2. CORE FUNCTIONS ---
+
+@st.cache_data
+def load_office_data():
+    return pd.read_csv(CSV_URL)
+
+def get_google_creds():
+    scopes = ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive']
+    return service_account.Credentials.from_service_account_file(GOOGLE_SERVICE_ACCOUNT_FILE, scopes=scopes)
+
+def upload_images_to_drive(uploaded_files, creds):
+    drive_service = build('drive', 'v3', credentials=creds)
+    ids = []
+    for file in uploaded_files:
+        file_metadata = {'name': file.name, 'parents': [DRIVE_FOLDER_ID]}
+        media = MediaIoBaseUpload(file, mimetype=file.type, resumable=True)
+        res = drive_service.files().create(body=file_metadata, media_body=media, fields='id').execute()
+        ids.append(res.get('id'))
+    return ",".join(ids)
+
+def delete_drive_files(file_ids_str, creds):
+    if not file_ids_str: return
+    drive_service = build('drive', 'v3', credentials=creds)
+    for fid in file_ids_str.split(","):
+        try: drive_service.files().delete(fileId=fid).execute()
+        except: pass
+
+# --- 3. UI LAYOUT ---
+
+st.set_page_config(page_title="Geo-Data Collector Pro", layout="wide")
+st.title("📍 ระบบบันทึกข้อมูลเชิงพื้นที่สมบูรณ์แบบ")
+
+try:
+    df_office = load_office_data()
+
+    # SECTION 1: ข้อมูลเบื้องต้น
+    with st.expander("📝 ส่วนที่ 1: ข้อมูลทั่วไป", expanded=True):
+        c1, c2, c3 = st.columns(3)
+        with c1:
+            provinces = sorted(df_office['pro_name'].unique())
+            sel_province = st.selectbox("เลือกจังหวัด", provinces)
+        with c2:
+            filtered_offices = df_office[df_office['pro_name'] == sel_province]
+            sel_office = st.selectbox("เลือกหน่วยงาน", sorted(filtered_offices['office_name'].unique()))
+        with c3:
+            user_note = st.text_input("บันทึกเพิ่มเติม")
+
+    # SECTION 2: อัพโหลดและ Preview
+    with st.expander("🗺️ ส่วนที่ 2: อัพโหลดและตรวจสอบแผนที่", expanded=True):
+        up1, up2 = st.columns([1, 1])
+        with up1:
+            img_files = st.file_uploader("รูปภาพ (หลายไฟล์)", type=['jpg','png','jpeg'], accept_multiple_files=True)
+        with up2:
+            shp_file = st.file_uploader("Shapefile (.zip)", type=['zip'])
+
+        if shp_file:
+            gdf = gpd.read_file(shp_file)
+            if gdf.crs != "EPSG:4326":
+                gdf = gdf.to_crs(epsg=4326)
+            
+            st.write(f"✅ พบข้อมูล {len(gdf)} features")
+            
+            # เลือก Index ที่ต้องการ
+            selected_indices = st.multiselect(
+                "เลือก Index ที่ต้องการบันทึก (ลบออกเพื่อไม่บันทึก)", 
+                options=gdf.index.tolist(),
+                default=gdf.index.tolist()
+            )
+            
+            if selected_indices:
+                filtered_gdf = gdf.loc[selected_indices]
+                
+                # แผนที่ภาพถ่ายดาวเทียม
+                m = leafmap.Map(google_map="SATELLITE")
+                m.add_gdf(filtered_gdf, layer_name="Preview")
+                m.zoom_to_gdf(filtered_gdf)
+                st_folium(m, width=1300, height=450)
+                
+                st.dataframe(filtered_gdf.drop(columns='geometry'), use_container_width=True)
+            else:
+                st.warning("⚠️ โปรดเลือกอย่างน้อย 1 feature")
+
+    # SECTION 3: บันทึกข้อมูล
+    if st.button("🚀 ยืนยันและบันทึกข้อมูลทั้งหมด", use_container_width=True):
+        if not (shp_file and img_files and user_note and selected_indices):
+            st.error("❌ ข้อมูลไม่ครบ: กรุณาใส่โน้ต เลือกรูปภาพ และเลือก Feature ในแผนที่")
+        else:
+            batch_id = str(uuid.uuid4())
+            uploaded_drive_ids = None
+            engine = create_engine(DB_CONFIG)
+            
+            try:
+                creds = get_google_creds()
+                bar = st.progress(0)
+                
+                # 1. Drive
+                st.write("⏳ กำลังบันทึกรูปภาพ...")
+                uploaded_drive_ids = upload_images_to_drive(img_files, creds)
+                bar.progress(33)
+                
+                # 2. PostGIS
+                st.write("⏳ กำลังบันทึกข้อมูลเชิงพื้นที่...")
+                filtered_gdf['batch_id'] = batch_id
+                with engine.begin() as conn:
+                    filtered_gdf.to_postgis("survey_data", conn, if_exists='append', index=False)
+                    res = conn.execute(text("SELECT id FROM survey_data WHERE batch_id = :bid"), {"bid": batch_id})
+                    feature_ids_str = ",".join([str(r[0]) for r in res])
+                bar.progress(66)
+                
+                # 3. Google Sheets
+                st.write("⏳ กำลังบันทึกสรุปลง Google Sheet...")
+                gc = gspread.authorize(creds)
+                sheet = gc.open_by_key(SPREADSHEET_ID).sheet1
+                sheet.append_row([
+                    str(datetime.datetime.now()), sel_province, sel_office, 
+                    user_note, uploaded_drive_ids, feature_ids_str, batch_id
+                ])
+                
+                bar.progress(100)
+                st.success(f"🎊 บันทึกข้อมูลสำเร็จ! (Batch ID: {batch_id})")
+                st.balloons()
+
+            except Exception as e:
+                st.error(f"💥 เกิดข้อผิดพลาด: {e}")
+                st.warning("🔄 เริ่มกระบวนการ Rollback ...")
+                if uploaded_drive_ids:
+                    delete_drive_files(uploaded_drive_ids, creds)
+                with engine.begin() as conn:
+                    conn.execute(text("DELETE FROM survey_data WHERE batch_id = :bid"), {"bid": batch_id})
+                st.info("✅ ล้างข้อมูลที่ผิดพลาดเรียบร้อยแล้ว")
+
+except Exception as e:
+    st.error(f"ไม่สามารถโหลดข้อมูลเริ่มต้นได้: {e}")
