@@ -117,6 +117,8 @@ try:
     with st.expander("🗺️ ส่วนที่ 3: รายละเอียดสิ่งปลูกสร้าง", expanded=True):
         bd_type = st.selectbox("ประเภทสิ่งปลูกสร้าง", ["อาคารสำนักงาน","ขอบเขตพื้นที่","โรงจอดรถ","โรงอาหาร","อาคารที่พักอาศัย","อาคารเอนกประสงค์","อื่นๆ"])
         bd_name = st.text_input("ชื่อสิ่งปลูกสร้าง", "")
+        bd_floor = st.text_input("จำนวนชั้น", "")
+        bd_remark = st.text_input("รายละเอียดอื่นๆ", "")
     # SECTION 3: บันทึกข้อมูล
     if st.button("🚀 ยืนยันและบันทึกข้อมูลทั้งหมด", use_container_width=True):
         if not (shp_file and img_files  and selected_indices):
