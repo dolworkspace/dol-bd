@@ -109,18 +109,7 @@ try:
             )
             m.add_gdf(filtered_gdf, layer_name="Preview")
             m.zoom_to_gdf(filtered_gdf)
-            st.markdown(
-                            """
-                            <style>
-                            .stFolium {
-                                display: flex;
-                                justify-content: center;
-                            }
-                            </style>
-                            """,
-                            unsafe_allow_html=True
-                        )
-            st_folium(m, width=1300, height=1000)
+            st_folium(m, height=1000, use_container_width=True)
             
         else:
             st.warning("⚠️ โปรดเลือกอย่างน้อย 1 feature")
