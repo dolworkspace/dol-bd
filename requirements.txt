@@ -1,1 +1,11 @@
-streamlit
+streamlit 
+pandas 
+geopandas 
+sqlalchemy 
+psycopg2-binary 
+google-api-python-client 
+google-auth 
+gspread 
+geoalchemy2 
+leafmap 
+streamlit-folium
