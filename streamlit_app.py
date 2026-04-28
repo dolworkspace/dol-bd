@@ -14,7 +14,6 @@ from streamlit_folium import st_folium
 # --- 1. CONFIGURATION ---
 CSV_URL = "https://raw.githubusercontent.com/chakrit39/event2023/refs/heads/main/office_seq.csv"
 DB_CONFIG = "postgresql://username:password@host:port/database"
-GOOGLE_SERVICE_ACCOUNT_FILE = 'service_account.json'
 SPREADSHEET_ID = 'YOUR_GOOGLE_SHEET_ID'
 DRIVE_FOLDER_ID = 'YOUR_GOOGLE_DRIVE_FOLDER_ID'
 
@@ -86,10 +85,9 @@ try:
             st.write(f"✅ พบข้อมูล {len(gdf)} features")
             
             # เลือก Index ที่ต้องการ
-            selected_indices = st.multiselect(
-                "เลือก Index ที่ต้องการบันทึก (ลบออกเพื่อไม่บันทึก)", 
-                options=gdf.index.tolist(),
-                default=gdf.index.tolist()
+            selected_indices = st.select(
+                "เลือก Index ที่ต้องการบันทึก", 
+                options=gdf.index.tolist()
             )
             
             if selected_indices:
@@ -101,7 +99,6 @@ try:
                 m.zoom_to_gdf(filtered_gdf)
                 st_folium(m, width=1300, height=450)
                 
-                st.dataframe(filtered_gdf.drop(columns='geometry'), use_container_width=True)
             else:
                 st.warning("⚠️ โปรดเลือกอย่างน้อย 1 feature")
 
