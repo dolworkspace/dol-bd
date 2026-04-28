@@ -73,57 +73,57 @@ try:
         with up2:
             shp_file = st.file_uploader("Shapefile (.zip)", type=['zip'])
 
-        if shp_file:
-            gdf = gpd.read_file(shp_file)
-            if gdf.crs != "EPSG:4326":
-                indian_1975_with_shift = "+proj=utm +zone=47 +ellps=evrst30 +towgs84=204,837,295,0,0,0,0 +units=m +no_defs"
-                gdf.crs = indian_1975_with_shift
-                gdf = gdf.to_crs(epsg=4326)
-            
-            st.write(f"✅ พบข้อมูล {len(gdf)} features")
-            
-            # เลือก Index ที่ต้องการ
-            selected_indices = st.selectbox(
-                "เลือก Index ที่ต้องการบันทึก", 
-                options=gdf.index.tolist()
-            )
-            
-            if selected_indices != "":
-                filtered_gdf = gdf.loc[selected_indices:selected_indices]
-                #filtered_gdf = filtered_gdf.reset_index(drop=True)
-                #st.dataframe(filtered_gdf)
-                # แผนที่ภาพถ่ายดาวเทียม
-                #m = leafmap.Map(google_map="SATELLITE", max_zoom=22, max_native_zoom=18)
-                m = leafmap.Map(max_zoom=22) 
+    if shp_file:
+        gdf = gpd.read_file(shp_file)
+        if gdf.crs != "EPSG:4326":
+            indian_1975_with_shift = "+proj=utm +zone=47 +ellps=evrst30 +towgs84=204,837,295,0,0,0,0 +units=m +no_defs"
+            gdf.crs = indian_1975_with_shift
+            gdf = gdf.to_crs(epsg=4326)
+        
+        st.write(f"✅ พบข้อมูล {len(gdf)} features")
+        
+        # เลือก Index ที่ต้องการ
+        selected_indices = st.selectbox(
+            "เลือก Index ที่ต้องการบันทึก", 
+            options=gdf.index.tolist()
+        )
+        
+        if selected_indices != "":
+            filtered_gdf = gdf.loc[selected_indices:selected_indices]
+            #filtered_gdf = filtered_gdf.reset_index(drop=True)
+            #st.dataframe(filtered_gdf)
+            # แผนที่ภาพถ่ายดาวเทียม
+            #m = leafmap.Map(google_map="SATELLITE", max_zoom=22, max_native_zoom=18)
+            m = leafmap.Map(max_zoom=22) 
 
-                # 2. เพิ่ม Google Satellite Layer แบบกำหนดค่า Zoom เอง
-                # ใช้ URL มาตรฐานของ Google และกำหนด max_native_zoom
-                google_satellite_url = "https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}"
-                
-                m.add_tile_layer(
-                    url=google_satellite_url,
-                    name="Google Satellite",
-                    attribution="Google",
-                    max_zoom=22,           # ระดับที่อนุญาตให้ซูมในหน้าจอ (18-22 จะเป็นการขยายภาพ)
-                    max_native_zoom=18     # ระดับซูมสูงสุดที่ Google มีภาพจริง (ปกติคือ 18 หรือ 19)
-                )
-                m.add_gdf(filtered_gdf, layer_name="Preview")
-                m.zoom_to_gdf(filtered_gdf)
-                st.markdown(
-                                """
-                                <style>
-                                .stFolium {
-                                    display: flex;
-                                    justify-content: center;
-                                }
-                                </style>
-                                """,
-                                unsafe_allow_html=True
-                            )
-                st_folium(m, width=1300, height=1000)
-                
-            else:
-                st.warning("⚠️ โปรดเลือกอย่างน้อย 1 feature")
+            # 2. เพิ่ม Google Satellite Layer แบบกำหนดค่า Zoom เอง
+            # ใช้ URL มาตรฐานของ Google และกำหนด max_native_zoom
+            google_satellite_url = "https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}"
+            
+            m.add_tile_layer(
+                url=google_satellite_url,
+                name="Google Satellite",
+                attribution="Google",
+                max_zoom=22,           # ระดับที่อนุญาตให้ซูมในหน้าจอ (18-22 จะเป็นการขยายภาพ)
+                max_native_zoom=18     # ระดับซูมสูงสุดที่ Google มีภาพจริง (ปกติคือ 18 หรือ 19)
+            )
+            m.add_gdf(filtered_gdf, layer_name="Preview")
+            m.zoom_to_gdf(filtered_gdf)
+            st.markdown(
+                            """
+                            <style>
+                            .stFolium {
+                                display: flex;
+                                justify-content: center;
+                            }
+                            </style>
+                            """,
+                            unsafe_allow_html=True
+                        )
+            st_folium(m, width=1300, height=1000)
+            
+        else:
+            st.warning("⚠️ โปรดเลือกอย่างน้อย 1 feature")
 
     # SECTION 3: บันทึกข้อมูล
     if st.button("🚀 ยืนยันและบันทึกข้อมูลทั้งหมด", use_container_width=True):
