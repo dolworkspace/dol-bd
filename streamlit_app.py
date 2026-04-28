@@ -26,7 +26,11 @@ def load_office_data():
 
 def get_google_creds():
     scopes = ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive']
-    return service_account.Credentials.from_service_account_file(GOOGLE_SERVICE_ACCOUNT_FILE, scopes=scopes)
+    info = st.secrets["gcp_service_account"]
+    credentials = service_account.Credentials.from_service_account_info(
+        info, scopes=scopes]
+        )
+    return credentials
 
 def upload_images_to_drive(uploaded_files, creds):
     drive_service = build('drive', 'v3', credentials=creds)
