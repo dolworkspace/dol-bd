@@ -85,7 +85,7 @@ try:
             st.write(f"✅ พบข้อมูล {len(gdf)} features")
             
             # เลือก Index ที่ต้องการ
-            selected_indices = st.select(
+            selected_indices = st.selectbox(
                 "เลือก Index ที่ต้องการบันทึก", 
                 options=gdf.index.tolist()
             )
