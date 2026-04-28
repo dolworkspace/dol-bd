@@ -28,8 +28,7 @@ def get_google_creds():
     scopes = ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive']
     info = st.secrets["gcp_service_account"]
     credentials = service_account.Credentials.from_service_account_info(
-        info, scopes=scopes]
-        )
+        info, scopes=scopes)
     return credentials
 
 def upload_images_to_drive(uploaded_files, creds):
