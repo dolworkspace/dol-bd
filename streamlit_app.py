@@ -50,7 +50,7 @@ def delete_drive_files(file_ids_str, creds):
 # --- 3. UI LAYOUT ---
 
 st.set_page_config(page_title="Geo-Data Collector", layout="wide")
-st.title("📍 ระบบบันทึกข้อมูลเชิงพื้นที่")
+st.title("ระบบบันทึกสิ่งปลูกสร้างที่อยู่ในความดูแลของกรมที่ดิน")
 
 try:
     df_office = load_office_data()
@@ -69,10 +69,8 @@ try:
     with st.expander("🗺️ ส่วนที่ 2: อัพโหลดและตรวจสอบแผนที่", expanded=True):
         up1, up2 = st.columns([1, 1])
         with up1:
-            img_files = st.file_uploader("รูปภาพ (หลายไฟล์)", type=['jpg','png','jpeg'], accept_multiple_files=True)
-        with up2:
             shp_file = st.file_uploader("Shapefile (.zip)", type=['zip'])
-
+            
         if shp_file:
             gdf = gpd.read_file(shp_file)
             if gdf.crs != "EPSG:4326":
@@ -119,6 +117,7 @@ try:
         bd_name = st.text_input("ชื่อสิ่งปลูกสร้าง", "")
         bd_floor = st.text_input("จำนวนชั้น", "")
         bd_remark = st.text_input("รายละเอียดอื่นๆ", "")
+        img_files = st.file_uploader("รูปภาพ (หลายไฟล์)", type=['jpg','png','jpeg'], accept_multiple_files=True)
     # SECTION 3: บันทึกข้อมูล
     if st.button("🚀 ยืนยันและบันทึกข้อมูลทั้งหมด", use_container_width=True):
         if not (shp_file and img_files  and selected_indices):
