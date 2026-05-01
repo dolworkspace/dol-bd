@@ -119,7 +119,7 @@ try:
         bd_remark = st.text_input("รายละเอียดอื่นๆ", "")
         img_files = st.file_uploader("รูปภาพ", type=['jpg','png','jpeg'], accept_multiple_files=True)
     # SECTION 3: บันทึกข้อมูล
-    if st.button("🚀 ยืนยันและบันทึกข้อมูลทั้งหมด", use_container_width=True):
+    if st.button("🚀 ยืนยันและบันทึกข้อมูลทั้งหมด"):
         if not (shp_file and img_files  and selected_indices):
             st.error("❌ ข้อมูลไม่ครบ: กรุณาใส่โน้ต เลือกรูปภาพ และเลือก Feature ในแผนที่")
         else:
