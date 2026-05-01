@@ -50,7 +50,7 @@ def delete_drive_files(file_ids_str, creds):
 # --- 3. UI LAYOUT ---
 
 st.set_page_config(page_title="Geo-Data Collector", layout="wide")
-st.title("ระบบบันทึกสิ่งปลูกสร้างที่อยู่ในความดูแลของกรมที่ดิน")
+st.title("ระบบบันทึกข้อมูลสิ่งปลูกสร้างที่อยู่ในความดูแลของกรมที่ดิน")
 
 try:
     df_office = load_office_data()
