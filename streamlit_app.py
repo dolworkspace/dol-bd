@@ -67,7 +67,7 @@ try:
 
     # SECTION 2: อัพโหลดและ Preview
     with st.expander("🗺️ ส่วนที่ 2: อัพโหลดและตรวจสอบแผนที่", expanded=True):
-        up1, up2 = st.columns([1, 1])
+        up1, up2, up3 = st.columns([1, 1, 1])
         with up1:
             shp_file = st.file_uploader("Shapefile (.zip)", type=['zip'])
             
