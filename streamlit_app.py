@@ -107,7 +107,7 @@ try:
                 )
                 m.add_gdf(filtered_gdf, layer_name="Preview")
                 m.zoom_to_gdf(filtered_gdf)
-                st_folium(m, height=1000, use_container_width=True)
+                st_folium(m, height=500, use_container_width=True)
                 
             else:
                 st.warning("⚠️ โปรดเลือกอย่างน้อย 1 feature")
