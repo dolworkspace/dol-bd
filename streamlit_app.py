@@ -10,7 +10,37 @@ import datetime
 import uuid
 import leafmap.foliumap as leafmap
 from streamlit_folium import st_folium
+# 1. กำหนด CSS สำหรับ Sticky Header
+st.markdown(
+    """
+    <style>
+    div[data-testid="stVerticalBlock"] > div:has(div.fixed-header) {
+        position: sticky;
+        top: 2.875rem;
+        background-color: white;
+        z-index: 999;
+    }
+    .fixed-header {
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 10px;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
 
+# 2. สร้าง Container สำหรับ Header
+header = st.container()
+with header:
+    st.markdown('<div class="fixed-header">', unsafe_allow_html=True)
+    st.title("📌 แถบเมนูด้านบน (Sticky Header)")
+    st.write("แถบนี้จะอยู่ติดขอบบนตลอดเวลา")
+    st.markdown('</div>', unsafe_allow_html=True)
+
+# 3. ใส่เนื้อหาจำลองเพื่อให้เห็นการ Scroll
+for i in range(50):
+    st.write(f"เนื้อหาบรรทัดที่ {i+1}: ลองเลื่อนหน้าจอลงดูครับ...")
+    
 # --- 1. CONFIGURATION ---
 CSV_URL = "https://raw.githubusercontent.com/chakrit39/event2023/refs/heads/main/office_seq.csv"
 DB_CONFIG = "postgresql://username:password@host:port/database"
