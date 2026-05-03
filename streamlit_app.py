@@ -32,10 +32,10 @@ st.markdown(
 # 2. สร้าง Container สำหรับ Header
 header = st.container()
 with header:
-    #st.markdown('<div class="fixed-header">', unsafe_allow_html=True)
+    st.markdown('<div class="fixed-header">', unsafe_allow_html=True)
     st.title("📌 แถบเมนูด้านบน (Sticky Header)")
     #st.write("แถบนี้จะอยู่ติดขอบบนตลอดเวลา")
-    #st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
     
 # --- 1. CONFIGURATION ---
