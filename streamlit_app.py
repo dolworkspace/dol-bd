@@ -16,7 +16,7 @@ st.markdown(
     <style>
     div[data-testid="stVerticalBlock"] > div:has(div.fixed-header) {
         position: sticky;
-        top: 0rem;
+        top: 2rem;
         z-index: 999;
     }
     .fixed-header {
