@@ -119,6 +119,7 @@ try:
             pacel_no = st.text_input("เลขที่เอกสารสิทธิ", "")
             area = st.text_input("เนื้อที่", "")
             office_name = st.selectbox("ชื่อสำนักงาน", [sel_office])
+            pro = st.selectbox("จังหวัด", [sel_province])
             amphoe = st.selectbox("อำเภอ", ["test"])
             tambon = st.selectbox("ตำบล", ["test"])
         elif shp_type == "สิ่งปลูกสร้าง":
