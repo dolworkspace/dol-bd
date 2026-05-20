@@ -113,11 +113,21 @@ try:
                 st.warning("⚠️ โปรดเลือกอย่างน้อย 1 feature")
                 
     with st.expander("🗺️ ส่วนที่ 3: รายละเอียดสิ่งปลูกสร้าง", expanded=True):
-        bd_type = st.selectbox("ประเภทสิ่งปลูกสร้าง", ["อาคารสำนักงาน","ขอบเขตพื้นที่","โรงจอดรถ","โรงอาหาร","อาคารที่พักอาศัย","อาคารเอนกประสงค์","อื่นๆ"])
-        bd_name = st.text_input("ชื่อสิ่งปลูกสร้าง", "")
-        bd_floor = st.text_input("จำนวนชั้น", "")
-        bd_remark = st.text_input("รายละเอียดอื่นๆ", "")
-        img_files = st.file_uploader("รูปภาพ", type=['jpg','png','jpeg'], accept_multiple_files=True)
+        shp_type = st.selectbox("ประเภท Shapefile", ["ขอบเขตพื้นที่","สิ่งปลูกสร้าง"])
+        if shp_type == "ขอบเขตพื้นที่":
+            pacel_type = st.selectbox("ประเภทเอกสารสิทธิ", [""])
+            pacel_no = st.text_input("เลขที่เอกสารสิทธิ", "")
+            area = st.text_input("เนื้อที่", "")
+            office_name = st.selectbox("ชื่อสำนักงาน", [sel_office])
+            amphoe = st.selectbox("อำเภอ", ["test"])
+            tambon = st.selectbox("ตำบล", ["test"])
+        elif shp_type == "สิ่งปลูกสร้าง"::
+            bd_type = st.selectbox("ประเภทสิ่งปลูกสร้าง", ["อาคารสำนักงาน","โรงจอดรถ","โรงอาหาร","อาคารที่พักอาศัย","อาคารเอนกประสงค์","อื่นๆ"])
+            bd_name = st.text_input("ชื่อสิ่งปลูกสร้าง", "")
+            bd_floor = st.text_input("จำนวนชั้น", "")
+            bd_room = st.text_input("จำนวนห้อง", "")
+            bd_remark = st.text_input("รายละเอียดอื่นๆ", "")
+            img_files = st.file_uploader("รูปภาพ 4 ด้าน", type=['jpg','png','jpeg'], accept_multiple_files=True)
     # SECTION 3: บันทึกข้อมูล
     if st.button("🚀 ยืนยันและบันทึกข้อมูลทั้งหมด"):
         if not (shp_file and img_files  and selected_indices):
