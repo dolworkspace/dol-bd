@@ -112,7 +112,7 @@ try:
             else:
                 st.warning("⚠️ โปรดเลือกอย่างน้อย 1 feature")
                 
-    with st.expander("🗺️ ส่วนที่ 3: รายละเอียดสิ่งปลูกสร้าง", expanded=True):
+    with st.expander("🗺️ ส่วนที่ 3: รายละเอียด", expanded=True):
         shp_type = st.selectbox("ประเภท Shapefile", ["ขอบเขตพื้นที่","สิ่งปลูกสร้าง"])
         if shp_type == "ขอบเขตพื้นที่":
             pacel_type = st.selectbox("ประเภทเอกสารสิทธิ", [""])
