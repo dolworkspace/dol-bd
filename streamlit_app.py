@@ -121,7 +121,7 @@ try:
             office_name = st.selectbox("ชื่อสำนักงาน", [sel_office])
             amphoe = st.selectbox("อำเภอ", ["test"])
             tambon = st.selectbox("ตำบล", ["test"])
-        elif shp_type == "สิ่งปลูกสร้าง"::
+        elif shp_type == "สิ่งปลูกสร้าง":
             bd_type = st.selectbox("ประเภทสิ่งปลูกสร้าง", ["อาคารสำนักงาน","โรงจอดรถ","โรงอาหาร","อาคารที่พักอาศัย","อาคารเอนกประสงค์","อื่นๆ"])
             bd_name = st.text_input("ชื่อสิ่งปลูกสร้าง", "")
             bd_floor = st.text_input("จำนวนชั้น", "")
